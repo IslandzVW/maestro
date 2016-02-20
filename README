@@ -1,0 +1,12 @@
+Building maestro is straightforward.
+
+- Install a python compiler.  32 or 64bit should work.  Testing was done with 2.7 so I havent verified Python3 will work.
+
+- Install the dependencies in dependencies.txt
+
+- Run setup.py.  It will generate a set of executables.
+
+- Install NSISETUP.  cd to the PKG directory and run it on the NSI file there to generate the installer.
+
+Thats all there is to it.
+

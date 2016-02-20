@@ -1,0 +1,9 @@
+ez_setup
+pywin32
+py2exe
+esky
+Jinja2
+psutil
+mysql.connector
+pyreadline
+pycrypto

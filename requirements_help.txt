@@ -1,0 +1,14 @@
+
+Set PYTHONPATH to include maestro\src;maestro\tests;maestro\client\python
+In my case: PYTHONPATH=D:\DevSL\InWorldz\maestro\src;D:\DevSL\InWorldz\maestro\tests;D:\DevSL\InWorldz\maestro\client\python
+
+ez_setup				https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+  (pip -not required)	https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+pywin32					http://sourceforge.net/projects/pywin32/files/pywin32/
+py2exe					http://www.py2exe.org/ http://sourceforge.net/projects/py2exe/files/py2exe/0.6.9/
+esky					https://pypi.python.org/pypi/esky   ("setup.py build" and "setup.py install") 
+Jinja2					easy_install Jinja2
+psutil					easy_install psutil
+mysql.connector			http://dev.mysql.com/downloads/connector/python/2.0.html
+pyreadline				easy_install pyreadline
+pycrypto				for 64-bit python: http://www.voidspace.org.uk/python/pycrypto-2.6.1/pycrypto-2.6.1.win-amd64-py2.7.exe
