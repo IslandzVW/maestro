@@ -128,7 +128,7 @@ class Process(ServiceBase):
 #    if (len(p.cmdline()) <= 0):
 #        continue
 #    cmdline = p.cmdline()[0]
-#    if os.path.basename(cmdline) == "OpenSim.exe":
+#    if os.path.basename(cmdline) == "Halcyon.exe":
 #        print cmdline
 #        print os.path.dirname(cmdline)
 #        print p.pid

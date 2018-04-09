@@ -7,7 +7,7 @@ session.login_with_password('mdickson', 'w1zard')
 result = session.api.Console.Command("show users")
 print result
 
-region = session.api.Region.GetByName("OpenSim Test")
+region = session.api.Region.GetByName("Halcyon Test")
 print result
 
 session.api.Region.Restart(region)

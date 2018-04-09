@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 '''
-RestConsole -- Implements a remote console using Rest to the OpenSim Services
+RestConsole -- Implements a remote console using Rest to the Halcyon Services
 
 @author:     Mike Dickson
 @copyright:  2013 InWorldz, LLC. All rights reserved.

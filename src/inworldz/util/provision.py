@@ -94,7 +94,7 @@ def _findRegionProcess(slotnum):
             continue
         cmdline = p.cmdline()[0]
         if ((os.path.dirname(cmdline) == bindir) and
-            (os.path.basename(cmdline) == "OpenSim.exe")):
+            (os.path.basename(cmdline) == "Halcyon.exe")):
             return (p)
     return None
 
