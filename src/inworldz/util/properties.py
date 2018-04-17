@@ -44,10 +44,14 @@ class DefaultProperties():
     @property
     def hostName(self):
         return self.hostingResource.hostName
+    
+    @property
+    def defaultConfigFilePath(self):
+        return os.path.join(self.appdata, product_name(), "maestro.config")
 
     def loadConfiguration(self, filePath=None):
         if (filePath == None):
-            filePath = os.path.join(self.appdata, product_name(), "maestro.config")
+            filePath = self.defaultConfigFilePath
         if (os.path.exists(filePath)):
             self.configParser.read(filePath)
 

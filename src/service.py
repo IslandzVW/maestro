@@ -57,11 +57,11 @@ class MaestroService(win32serviceutil.ServiceFramework):
 
     def starting(self):
         try:
+            self.props = DefaultProperties.instance()
             self.appdata = getCurrentUsersAppDataPath()
-            self.propfile = os.path.join(self.appdata, product_name(), "maestro.config") 
+            self.propfile = self.props.defaultConfigFilePath
             self.address = "0.0.0.0"
             self.port = 12089
-            self.props = DefaultProperties.instance()
             self.props.loadConfiguration(self.propfile)
             self.server = MaestroServer(AUTH_WINDOWS, self.address, self.port, self.propfile)
             self.thread = Thread(target = self.server.run, args = ())
