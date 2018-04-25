@@ -617,7 +617,7 @@ class RegionHost(ServiceBase):
         p = provision._findRegionProcessByBin(path_to_bin)
         if p == None:
             return True
-        p.terminate() # This sends CTRL-C, which will cause an immidatiate shutdown...  That's not what's in thew above description.
+        p.terminate() # This sends CTRL-C, which will cause an immediate clean shutdown, which is perfect.
         
         if inworldz.util.process.WaitForProcessTermination(p, 30):
             return True
