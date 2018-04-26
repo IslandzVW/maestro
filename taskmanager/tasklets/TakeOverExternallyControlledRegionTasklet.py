@@ -11,7 +11,7 @@ import time
 
 class TakeOverExternallyControlledSimulatorTasklet(TaskletBase):
     '''
-    Tasklet for taking a simulator away from the control system currently running it and moving it to Maestro.
+    Tasklet for taking a simulator away from the control system currently running it, moving it to Maestro, and optionally starting it back up again.
     Procedure:
     1. Using your current grid manager send alerts to all regions in the VM about a pending restart.
     2. Wait for the time you specified in the alert.
@@ -25,6 +25,7 @@ class TakeOverExternallyControlledSimulatorTasklet(TaskletBase):
         # TakeOverExternallyControlledRegionTasklet
         # {
         #    "simulatorPath": "[path to simulator bin folder]",
+        #    "startRegions": true/false,
         # }
         host = self.session.api.RegionHost.get_all()[0]
         
@@ -39,7 +40,8 @@ class TakeOverExternallyControlledSimulatorTasklet(TaskletBase):
         while not self.session.api.RegionHost.ShutdownUncontrolledSimulatorByPath(self.args['simulatorPath']):
             time.sleep(0.1)
 
-        for region in regions:
-            # Tell the new copy to power up.
-            self.session.api.Region.ChangeState(region, RegionState.DeployedStarting)
-            self.session.api.Region.Start(region)
+        if self.args['startRegions']:
+            for region in regions:
+                # Tell the new copy to power up.
+                self.session.api.Region.ChangeState(region, RegionState.DeployedStarting)
+                self.session.api.Region.Start(region)
