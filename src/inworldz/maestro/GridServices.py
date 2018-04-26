@@ -115,13 +115,11 @@ class GridServiceBase(ServiceBase):
     def Terminate(self):
         self.shouldBeRunning = False
         
-        """ Shutdown the region after sending an Alert and delaying for a specified interval """
+        """ Shutdown the service immediately but safely. """
         p = provision._findServiceProcess(self.exe_name)
         if (p == None):
             return (True)
-        p.terminate()
-        p = provision._findServiceProcess(self.exe_name)
-        return (p == None)
+        return inworldz.util.process.TerminateAndWaitForConfirmation(p, 30)
 
 
     def ConsoleCommand(self, command):

@@ -29,6 +29,10 @@ def WaitForProcessTermination(process, timeout):
     else:
         return True
 
+def TerminateAndWaitForConfirmation(process, timeout):
+    process.terminate() # This sends CTRL-C, which will cause an immediate shutdown.
+    return WaitForProcessTermination(process, timeout)
+
 def DumpThreadStacks(pid):
     sddir = os.path.dirname(sys.argv[0])
     p = psutil.Popen([os.path.join(sddir, "stackdump.exe"), str(pid)], 

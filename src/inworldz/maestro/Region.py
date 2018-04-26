@@ -460,13 +460,12 @@ class Region(ServiceBase):
             return False
  
     def Terminate(self):
-        """ Shutdown the region after sending an Alert and delaying for a specified interval """
+        """ Shutdown the region immediately but safely. """
         p = provision._findRegionProcess(self.slot_number)
-        if (p == None):
-            return (True)
-        p.terminate()
-        
-        if inworldz.util.process.WaitForProcessTermination(p, 30):
+        if p == None:
+            return True
+
+        if inworldz.util.process.TerminateAndWaitForConfirmation(p, 30):
             self.ChangeState(RegionState.DeployedStopped)
             return True
         else:
