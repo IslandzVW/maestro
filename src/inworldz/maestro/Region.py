@@ -439,14 +439,13 @@ class Region(ServiceBase):
         """ Requests a start/restart of the managed sim node with an alert and a delay.
             If restart is False nothing is done if we are already running.  If True and the
             region is running an alert is sent and the region restarted after the delay. """
-        p = provision._findRegionProcess(self.slot_number)
-        if p != None:
+        if self.IsRunning():
             if (restart == False):
                 return (True)
             else:
                 self.Shutdown(delay)
         
-        """" Make sure there is a region config here... """
+        # TODO: Make sure there is a region config here...
         
         bindir = os.path.join(self.slot_directory, "bin")
         exename = os.path.join(bindir, self.exe_name)
@@ -460,13 +459,12 @@ class Region(ServiceBase):
             return False
  
     def Terminate(self):
-        """ Shutdown the region after sending an Alert and delaying for a specified interval """
+        """ Shutdown the region immediately but safely. """
         p = provision._findRegionProcess(self.slot_number)
-        if (p == None):
-            return (True)
-        p.terminate()
-        
-        if inworldz.util.process.WaitForProcessTermination(p, 30):
+        if p == None:
+            return True
+
+        if inworldz.util.process.TerminateAndWaitForConfirmation(p, 30):
             self.ChangeState(RegionState.DeployedStopped)
             return True
         else:
