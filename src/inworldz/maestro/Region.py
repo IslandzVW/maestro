@@ -439,14 +439,13 @@ class Region(ServiceBase):
         """ Requests a start/restart of the managed sim node with an alert and a delay.
             If restart is False nothing is done if we are already running.  If True and the
             region is running an alert is sent and the region restarted after the delay. """
-        p = provision._findRegionProcess(self.slot_number)
-        if p != None:
+        if self.IsRunning():
             if (restart == False):
                 return (True)
             else:
                 self.Shutdown(delay)
         
-        """" Make sure there is a region config here... """
+        # TODO: Make sure there is a region config here...
         
         bindir = os.path.join(self.slot_directory, "bin")
         exename = os.path.join(bindir, self.exe_name)
