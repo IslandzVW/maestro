@@ -13,8 +13,12 @@ class TakeOverExternallyControlledSimulatorTasklet(TaskletBase):
     '''
     Tasklet for taking a simulator away from the control system currently running it and moving it to Maestro.
     Procedure:
-    1. Log into the VM and disable ZooKeeper, or whatever is managing the simulator process.
-    2. Execute this tasklet against every simulator on that VM.
+    1. Using your current grid manager send alerts to all regions in the VM about a pending restart.
+    2. Wait for the time you specified in the alert.
+    3. Disable the existing grid manager on that VM.
+    4. Execute this tasklet against every simulator "bin" folder path on that VM.
+
+    If the old simulator process fails to shut down, consequently preventing this tasklet from continuing, simply manually terminate the simulator and this tasklet will continue automatically.
     '''
 
     def execute(self):
