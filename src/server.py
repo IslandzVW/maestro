@@ -52,9 +52,9 @@ def main(argv=None):
         parser.add_option("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %default]")
 
         # set defaults
+        props = DefaultProperties.instance()
         appdata = getCurrentUsersAppDataPath()
-        propfile = os.path.join(appdata, product_name(), "maestro.config")
-        parser.set_defaults(address="0.0.0.0", port=DEFAULT_PORT, verbose=1, propfile=propfile)
+        parser.set_defaults(address="0.0.0.0", port=DEFAULT_PORT, verbose=1, propfile=props.defaultConfigFilePath)
 
         # process options
         (opts, args) = parser.parse_args(argv)
@@ -74,9 +74,8 @@ def main(argv=None):
             print("propfile = %s" % opts.propfile)
 
         # Load Default Properties
-        props = DefaultProperties.instance()
         if (opts.propfile != None):
-            props.loadConfiguration(propfile)
+            props.loadConfiguration(opts.propfile)
 
         #set encryption key
         CredentialCrypt.SECRET = props.getValue("credential_crypt_secret")

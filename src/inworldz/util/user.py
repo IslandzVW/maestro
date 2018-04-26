@@ -42,9 +42,8 @@ if __name__ == "__main__":
     from inworldz.util.filesystem import getCurrentUsersAppDataPath
     from inworldz.maestro.version import product_name
     appdata = getCurrentUsersAppDataPath()
-    propfile = os.path.join(appdata, product_name(), "maestro.config")
     props = DefaultProperties.instance()
-    props.loadConfiguration(propfile)
+    props.loadConfiguration()
     
     userid = LookupUserIdByName("Mike", "Chase")
     print userid
