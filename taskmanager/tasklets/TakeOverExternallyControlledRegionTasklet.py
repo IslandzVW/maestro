@@ -24,19 +24,19 @@ class TakeOverExternallyControlledSimulatorTasklet(TaskletBase):
     def execute(self):
         # TakeOverExternallyControlledRegionTasklet
         # {
-        #    "zkRegionPath": "[path to simulator bin folder]",
+        #    "simulatorPath": "[path to simulator bin folder]",
         # }
         host = self.session.api.RegionHost.get_all()[0]
         
-        if self.args['zkRegionPath'] == None:
-            raise Exception("zkRegionPath not specified")
-        if self.args['zkRegionPath'] == '':
-            raise Exception("zkRegionPath was blank")
+        if self.args['regionsimulatorPathPath'] == None:
+            raise Exception("simulatorPath not specified")
+        if self.args['simulatorPath'] == '':
+            raise Exception("simulatorPath was blank")
 
-        regions = self.session.api.RegionHost.TakePossessionOfRegion(host, self.args['zkRegionPath'])
+        regions = self.session.api.RegionHost.TakePossessionOfRegion(host, self.args['simulatorPath'])
         
         # Power off the simulator and wait for it to be finished.
-        while not self.session.api.RegionHost.ShutdownUncontrolledSimulatorByPath(self.args['zkRegionPath']):
+        while not self.session.api.RegionHost.ShutdownUncontrolledSimulatorByPath(self.args['simulatorPath']):
             time.sleep(0.1)
 
         for region in regions:
