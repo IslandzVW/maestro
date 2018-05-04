@@ -70,25 +70,39 @@ def GetSlotConfiguration(slotnum):
     """ Return all of the configurations we find in this slot.  Can be more 
         than one.  We use this on startup to build the regions list. """
     slotDirectory  = GetSlotDirectory(slotnum)
-    regionDir = os.path.join(slotDirectory, "bin", "Regions")
+    regionBin = os.path.join(slotDirectory, "bin")
+    return ReadRegionConfigs(regionBin)
+
+def ReadRegionConfigs(path_to_bin):
+    """ Return all of the configurations we find in this bin folder.  Can be more 
+        than one.  We use this on startup to build the regions list. """
+    regionDir = os.path.join(path_to_bin, "Regions")
     configFiles = glob.glob(os.path.join(regionDir,"*.xml"))
     result = {}
     for config in configFiles:
         if (os.access(config, os.O_RDONLY) == False):
             continue
-        tree = ET.parse(config)
-        root = tree.getroot()
-        record = {}
-        for child in root.iter('Config'):
-            for entry in child.attrib:
-                record[str.lower(entry)] = child.attrib[entry]
+        record = ReadRegionConfig(config)
         sim_uuid = record['sim_uuid']
         result[sim_uuid] = record
     return result
 
+def ReadRegionConfig(path_to_xml):
+    if (os.access(path_to_xml, os.O_RDONLY) == False):
+        return None
+    tree = ET.parse(path_to_xml)
+    root = tree.getroot()
+    record = {}
+    for child in root.iter('Config'):
+        for entry in child.attrib:
+            record[str.lower(entry)] = child.attrib[entry]
+    return record
 
 def _findRegionProcess(slotnum):
     bindir = os.path.join(GetSlotDirectory(slotnum), "bin")
+    return _findRegionProcessByBin(bindir)
+
+def _findRegionProcessByBin(bindir):
     for p in psutil.process_iter():
         if (len(p.cmdline()) <= 0):
             continue

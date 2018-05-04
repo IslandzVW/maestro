@@ -9,6 +9,7 @@ import time
 import os.path
 import threading
 import shlex
+import shutil
 import subprocess
 import psutil
 import Queue
@@ -18,6 +19,8 @@ import inworldz.util.properties as DefaultProperties
 
 from inworldz.util.filesystem import ConnectUNCShare
 from inworldz.util.rdbhost import GetRdbHost, AssignBestRdbHost
+
+import inworldz.util.general
 
 import inworldz.maestro.uuid as genuuid
 import inworldz.maestro.MaestroStore as store
@@ -31,6 +34,7 @@ from inworldz.maestro.GridServices import UserService, MessagingService, Apertur
     GridService
 import inworldz.maestro.environment.ComputeResource as ComputeResource
 from inworldz.maestro.environment.RegionEntry import RegionState, RegionEntry
+from inworldz.maestro.Estate import Estate
 from inworldz.maestro import User
 
 class RegionHost(ServiceBase):
@@ -340,33 +344,39 @@ class RegionHost(ServiceBase):
             if (self.IsSlotFree(slotnum)):
                 record['slot_number'] = slotnum
                 
-                try:
-                    region = Region.create(record)
-                    
-                    #also record this provisioning to the environment
-                    regEntry = RegionEntry(region.sim_uuid, region.sim_name, region.master_avatar_uuid, \
-                                           region.estate_id, region.get_region_product(), \
-                                           region.sim_location_x, region.sim_location_y, \
-                                           self.props.hostingResource.dbid, \
-                                           RegionState.SetupInProgress)
-
-                    self.props.hostingResource.registerNewRegion(regEntry)
-                    region.associateWithRegionEntry()
-                    
-                    self.region_add(region.get_uuid()) 
-                    
-                    return region.get_uuid()
-                
-                except:
-                    import traceback
-                    exc_type, exc_value, exc_traceback = sys.exc_info()
-                    traceback.print_exception(exc_type, exc_value, exc_traceback)
-                    raise ServiceError(exc_value)     
+                regions = self.RecordSimulatorRegions([record])
+                return regions[0].get_uuid()
 
         """ No slots found available. tell them """
         raise ServiceError("No region slot is available")
     
-    
+    def RecordSimulatorRegions(self, region_records):
+        regions = []
+        for record in region_records:
+            try:
+                region = Region.create(record)
+                
+                #also record this provisioning to the environment
+                regEntry = RegionEntry(region.sim_uuid, region.sim_name, region.master_avatar_uuid, \
+                                        region.estate_id, region.get_region_product(), \
+                                        region.sim_location_x, region.sim_location_y, \
+                                        self.props.hostingResource.dbid, \
+                                        RegionState.SetupInProgress)
+
+                self.props.hostingResource.registerNewRegion(regEntry)
+                region.associateWithRegionEntry()
+                
+                self.region_add(region.get_uuid()) 
+                
+                regions.append(region)
+            
+            except:
+                import traceback
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_exception(exc_type, exc_value, exc_traceback)
+                raise ServiceError(exc_value)
+        return regions
+
     def UpdateRegionToRevision(self, region_uuid, revision):
         """ Update the region to the revision specified. """
         region = store.get(region_uuid, Region.getClass())
@@ -596,4 +606,56 @@ class RegionHost(ServiceBase):
             return None   
         
     def RunCommandAs(self, username, password, cwd, cmd, cmdargs):
-        self.RunCommandAsEx(username, password, cwd, cmd, cmdargs)  
+        self.RunCommandAsEx(username, password, cwd, cmd, cmdargs)
+
+
+    def ShutdownUncontrolledSimulatorByPath(self, path_to_bin):
+        """
+        Tells the simulator to die, based on where in the filesystem it is run from.
+        DO NOT USE for Maestro-controlled regions.
+        """
+        p = provision._findRegionProcessByBin(path_to_bin)
+        if p == None:
+            return True
+        p.terminate() # This sends CTRL-C, which will cause an immediate clean shutdown, which is perfect.
+        
+        if inworldz.util.process.WaitForProcessTermination(p, 30):
+            return True
+        else:
+            return False
+
+    def TakePossessionOfSimulator(self, path_to_bin):
+        """
+        Copies the bin folder to a Maestro slot, getting region data from config files located in the bin folder.
+        Also records each region in the simulator in Maestro.
+        """
+        # Read region configs from bin/Regions/*.xml
+        region_records = provision.ReadRegionConfigs(path_to_bin)
+        
+        for record in region_records:
+            estate_id = Estate.FindEstateIDForRegion(record["sim_uuid"])
+            if not estate_id:
+                continue
+            record["estate_id"] = estate_id
+
+            slot_found = False
+
+            for slotnum in range(self.maxRegionSlots):
+                if (self.IsSlotFree(slotnum)):
+                    slotDir = provision.GetSlotDirectory(slotnum)
+                    try:
+                        shutil.copytree(path_to_bin, slotDir)
+                    except:
+                        continue
+                    record['slot_number'] = slotnum
+                    slot_found = True
+                    break
+
+        if not slot_found:
+            return None
+
+        active_region_records = [record for record in region_records if "estate_id" in record and "slot_number" in record]
+
+        return self.RecordSimulatorRegions(active_region_records)
+
+
