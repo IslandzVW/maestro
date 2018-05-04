@@ -36,7 +36,7 @@ class Region(ServiceBase):
         ServiceBase.__init__(self, uuid, record)
         self.props = DefaultProperties.instance()
         dbconfig = self.props.getCoreDbConfig()
-        self.exe_name = "OpenSim.exe"
+        self.exe_name = "Halcyon.exe"
 #        self.exe_args = "--console rest"
         self.exe_args = ""
                         

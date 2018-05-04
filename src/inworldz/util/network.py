@@ -137,11 +137,11 @@ def OpenAllFirewallPorts(
 
     for i in range(maxRegionSlots):
         print "Opening UDP port {0} on firewall".format(startingUdpPort + i);
-        FWOpenPort("OpenSim UDP {0}".format(i), startingUdpPort + i, 
+        FWOpenPort("Halcyon UDP {0}".format(i), startingUdpPort + i, 
                    NET_FW_IP_PROTOCOL_UDP, NET_FW_SCOPE_ALL, NET_FW_IP_VERSION_ANY)
 
         print "Opening TCP port {0} on firewall".format(startingHttpPort + i)
-        FWOpenPort("OpenSim TCP {0}".format(i), startingHttpPort + i,
+        FWOpenPort("Halcyon TCP {0}".format(i), startingHttpPort + i,
                    NET_FW_IP_PROTOCOL_TCP, NET_FW_SCOPE_ALL, NET_FW_IP_VERSION_ANY)
 
     FWOpenSubnet("Backend Subnet", backendSubnet);
